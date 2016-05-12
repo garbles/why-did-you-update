@@ -37,8 +37,6 @@ const deepDiff = (prev, next, name) => {
       const keys = _union(_keys(prev), _keys(next))
       keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
     }
-  } else if (prev === next && !isRefEntity) {
-    notify(`error`, `Value did not change. Avoidable re-render!`)
   }
 }
 
