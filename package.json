@@ -9,21 +9,24 @@
     "umd"
   ],
   "scripts": {
-    "build": "nwb build",
+    "build": "npm run build:react:15",
+    "build:react:14": "npm run test:react:14 && nwb build",
+    "build:react:15": "npm run test:react:15 && nwb build",
     "clean": "nwb clean",
     "start": "nwb serve",
-    "test": "nwb test",
+    "test": "npm run test:react:14 && npm run test:react:15",
+    "test:react:14": "npm i react@^0.14 react-dom@^0.14 && nwb test",
+    "test:react:15": "npm i react@^15 react-dom@^15 && nwb test",
     "test:watch": "nwb test --server"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.12.0"
+  },
   "peerDependencies": {
-    "react": "^15.0 || 0.14.x"
+    "react": ">= 0.14"
   },
   "devDependencies": {
-    "lodash": "4.12.0",
-    "nwb": "0.9.x",
-    "react": "0.14.x",
-    "react-dom": "0.14.x"
+    "nwb": "^0.9.x"
   },
   "author": "Gabe Scholz",
   "license": "MIT",
