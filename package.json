@@ -1,0 +1,34 @@
+{
+  "name": "why-did-you-update",
+  "version": "0.0.0",
+  "description": "Patch React to discover unecessary re-renders",
+  "main": "lib/index.js",
+  "files": [
+    "es6",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build",
+    "clean": "nwb clean",
+    "start": "nwb serve",
+    "test": "nwb test",
+    "test:watch": "nwb test --server"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "^15.0 || 0.14.x"
+  },
+  "devDependencies": {
+    "lodash": "4.12.0",
+    "nwb": "0.9.x",
+    "react": "0.14.x",
+    "react-dom": "0.14.x"
+  },
+  "author": "Gabe Scholz",
+  "license": "MIT",
+  "repository": "https://github.com/garbles/why-did-you-update",
+  "keywords": [
+    "react-component"
+  ]
+}
