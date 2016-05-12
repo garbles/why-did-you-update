@@ -1,7 +1,7 @@
 # Why did you update, bruh?
 
 [![Travis][build-badge]][build]
-[![npm package][npm-badge]][npm]
+[![npm version](https://badge.fury.io/js/why-did-you-update.svg)](https://badge.fury.io/js/why-did-you-update)
 
 ### Wat?
 
@@ -34,6 +34,3 @@ That is really awesome but also tedious AF, so why not just monkey patch React.
 
 [build-badge]: https://img.shields.io/travis/garbles/why-did-you-update/master.svg?style=flat-square
 [build]: https://travis-ci.org/garbles/why-did-you-update
-
-[npm-badge]: https://img.shields.io/npm/v/npm-package.svg?style=flat-square
-[npm]: https://www.npmjs.org/package/why-did-you-update
