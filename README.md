@@ -8,7 +8,7 @@
 ![](http://i.imgur.com/Ui8YUBe.png)
 
 A function that monkey patches React and puts your console on blast when your components are
-making unnecessary updates.
+making unnecessary updates. Super helpful for easy perf gains.
 
 ### How to
 
