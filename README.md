@@ -2,7 +2,6 @@
 
 [![Travis][build-badge]][build]
 [![npm package][npm-badge]][npm]
-[![Coveralls][coveralls-badge]][coveralls]
 
 ### Wat?
 
@@ -33,11 +32,8 @@ whyDidYouUpdate(React, { ignore: /^Connect/ })
 I originally read about how Benchling created a mixin to do this on a per component basis ([A deep dive into React perf debugging](http://benchling.engineering/deep-dive-react-perf-debugging/)).
 That is really awesome but also tedious AF, so why not just monkey patch React.
 
-[build-badge]: https://img.shields.io/travis/user/repo/master.svg?style=flat-square
-[build]: https://travis-ci.org/user/why-did-you-update
+[build-badge]: https://img.shields.io/travis/garbles/why-did-you-update/master.svg?style=flat-square
+[build]: https://travis-ci.org/garbles/why-did-you-update
 
 [npm-badge]: https://img.shields.io/npm/v/npm-package.svg?style=flat-square
 [npm]: https://www.npmjs.org/package/why-did-you-update
-
-[coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.svg?style=flat-square
-[coveralls]: https://coveralls.io/github/garbles/why-did-you-update
