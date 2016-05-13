@@ -3,8 +3,6 @@ import {render} from 'react-dom'
 
 import whyDidYouUpdate from '../../src'
 
-whyDidYouUpdate(React)
-
 class ClassDemo extends React.Component {
   render () {
     return <div />

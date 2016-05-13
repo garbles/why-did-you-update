@@ -107,4 +107,14 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(logStore.entries[0][2], fn)
     assert.equal(logStore.entries[1][2], fn2)
   })
+
+  it(`can ignore certain names`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {ignore: /Stub/})
+
+    render(<Stub a={1} />, node)
+    render(<Stub a={1} />, node)
+
+    assert.equal(errorStore.entries.length, 0)
+  })
 })
