@@ -1,4 +1,5 @@
 import _isString from 'lodash/isString'
+import _isArray from 'lodash/isArray'
 import _isRegExp from 'lodash/isRegExp'
 
 export const normalizeOptions = (opts = {}) => {
@@ -10,7 +11,9 @@ export const normalizeOptions = (opts = {}) => {
     include = /./
   }
 
-  if (_isString(exclude)) {
+  if (_isArray(exclude)) {
+    exclude = exclude;
+  } else if (_isString(exclude)) {
     exclude = new RegExp(exclude)
   } else if (!_isRegExp(exclude)) {
     exclude = /[^a-zA-Z0-9]/
