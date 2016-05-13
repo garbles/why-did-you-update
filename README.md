@@ -20,10 +20,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 ```
 
-To ignore some component names, you can pass an ignore regex
+You can include or exclude components by their displayName with the include and exclude options
 
 ```js
-whyDidYouUpdate(React, { ignore: /^Connect/ })
+whyDidYouUpdate(React, { include: /^pure/, exclude: /^Connect/ })
 ```
 
 ### Credit

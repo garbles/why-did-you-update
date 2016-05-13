@@ -1,6 +1,7 @@
 import _isEqual from 'lodash/isEqual'
 import _isFunction from 'lodash/isFunction'
 import _isObject from 'lodash/isObject'
+import _isString from 'lodash/isString'
 import _keys from 'lodash/keys'
 import _union from 'lodash/union'
 
@@ -40,13 +41,44 @@ const deepDiff = (prev, next, name) => {
   }
 }
 
+const shouldIncludeDisplayName = (displayName, {include, exclude}) => {
+  let isIncluded
+  let isExcluded
+
+  if (include && _isFunction(include.test)) {
+    isIncluded = include.test(displayName)
+  } else {
+    isIncluded = true
+  }
+
+  if (exclude && _isFunction(exclude.test)) {
+    isExcluded = exclude.test(displayName)
+  } else {
+    isExcluded = false
+  }
+
+  return isIncluded && !isExcluded
+}
+
 function createComponentDidUpdateProxy (componentDidUpdate = noop, opts = {}) {
+  let {include, exclude} = opts
+
+  if (_isString(include)) {
+    include = new RegExp(include)
+  }
+
+  if (_isString(exclude)) {
+    exclude = new RegExp(exclude)
+  }
+
+  opts = {...opts, include, exclude}
+
   return function componentDidUpdateProxy (prevProps, prevState) {
     const displayName = getDisplayName(this)
 
     componentDidUpdate.call(this, prevProps, prevState)
 
-    if (opts.ignore && _isFunction(opts.ignore.test) && opts.ignore.test(displayName)) {
+    if (!shouldIncludeDisplayName(displayName, opts)) {
       return
     }
 

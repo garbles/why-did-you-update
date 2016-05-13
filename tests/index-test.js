@@ -108,13 +108,103 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(logStore.entries[1][2], fn2)
   })
 
-  it(`can ignore certain names`, () => {
+  it(`can ignore certain names using a regexp`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
-    whyDidYouUpdate(React, {ignore: /Stub/})
+    whyDidYouUpdate(React, {exclude: /Stub/})
 
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
     assert.equal(errorStore.entries.length, 0)
+  })
+
+  it(`can ignore certain names using a string`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {exclude: 'Stub'})
+
+    render(<Stub a={1} />, node)
+    render(<Stub a={1} />, node)
+
+    assert.equal(errorStore.entries.length, 0)
+  })
+
+  it(`can include only certain names using a regexp`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {include: /Foo/})
+
+    class Foo extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    const createInstance = () =>
+      <div>
+        <Stub a={1} />
+        <Foo a={1} />
+      </div>
+
+    render(createInstance(), node)
+    render(createInstance(), node)
+
+    assert.equal(errorStore.entries.length, 1)
+    assert.equal(groupStore.entries.length, 1)
+    assert.equal(groupStore.entries[0][0], `Foo.props`)
+  })
+
+  it(`can include only certain names using a string`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {include: 'Foo'})
+
+    class Foo extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    const createInstance = () =>
+      <div>
+        <Stub a={1} />
+        <Foo a={1} />
+      </div>
+
+    render(createInstance(), node)
+    render(createInstance(), node)
+
+    assert.equal(errorStore.entries.length, 1)
+    assert.equal(groupStore.entries.length, 1)
+    assert.equal(groupStore.entries[0][0], `Foo.props`)
+  })
+
+  it(`can both include an exclude a string`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {include: /Stub/, exclude: 'Foo'})
+
+    class StubFoo extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    class StubBar extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    const createInstance = () =>
+      <div>
+        <Stub a={1} />
+        <StubFoo a={1} />
+        <StubBar a={1} />
+      </div>
+
+    render(createInstance(), node)
+    render(createInstance(), node)
+
+    assert.equal(errorStore.entries.length, 2)
+    assert.equal(groupStore.entries.length, 2)
+    assert.equal(groupStore.entries[0][0], `Stub.props`)
+    assert.equal(groupStore.entries[1][0], `StubBar.props`)
   })
 })
