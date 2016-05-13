@@ -1,6 +1,6 @@
 {
   "name": "why-did-you-update",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Patch React to discover unecessary re-renders",
   "main": "lib/index.js",
   "files": [
