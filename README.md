@@ -12,18 +12,24 @@ A function that monkey patches React and notifies you in the console when **pote
 ### How to
 
 ```js
-import React from 'react'
-import {whyDidYouUpdate} from 'why-did-you-update'
+import React from 'react';
+import {whyDidYouUpdate} from 'why-did-you-update';
 
 if (process.env.NODE_ENV !== 'production') {
-  whyDidYouUpdate(React)
+  whyDidYouUpdate(React);
 }
 ```
 
 You can include or exclude components by their displayName with the include and exclude options
 
 ```js
-whyDidYouUpdate(React, { include: /^pure/, exclude: /^Connect/ })
+whyDidYouUpdate(React, { include: /^pure/, exclude: /^Connect/ });
+```
+
+You can exclude multiple components by their displayName using an array. Note: this only works with strings for now
+
+```js
+whyDidYouUpdate(React, { exclude: ['Connect', 'DevTools']});
 ```
 
 ### Credit

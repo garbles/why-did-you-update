@@ -6,7 +6,7 @@ import {shouldInclude} from './shouldInclude'
 function createComponentDidUpdate (opts) {
   return function componentDidUpdate (prevProps, prevState) {
     const displayName = getDisplayName(this)
-
+  
     if (!shouldInclude(displayName, opts)) {
       return
     }
