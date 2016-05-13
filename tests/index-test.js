@@ -203,4 +203,40 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(groupStore.entries[0][0], `Stub.props`)
     assert.equal(groupStore.entries[1][0], `StubBar.props`)
   })
+
+  it(`works with createClass`, () => {
+    const Foo = React.createClass({
+      displayName: 'Foo',
+
+      render () {
+        return <noscript />
+      }
+    })
+
+    render(<Foo a={1} />, node)
+    render(<Foo a={1} />, node)
+
+    assert.equal(warnStore.entries.length, 1)
+    assert.equal(groupStore.entries.length, 1)
+    assert.equal(groupStore.entries[0][0], `Foo.props`)
+  })
+
+  it(`still calls the original componentDidUpdate for createClass`, done => {
+    const Foo = React.createClass({
+      displayName: 'Foo',
+
+      componentDidUpdate () {
+        done()
+      },
+
+      render () {
+        return <noscript />
+      }
+    })
+
+    render(<Foo a={1} />, node)
+    render(<Foo a={1} />, node)
+
+    assert.equal(warnStore.entries.length, 1)
+  })
 })
