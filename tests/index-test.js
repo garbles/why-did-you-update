@@ -31,7 +31,6 @@ describe(`whyDidYouUpdate`, () => {
   let node
   let groupStore
   let warnStore
-  let errorStore
   let logStore
 
   beforeEach(() => {
@@ -39,7 +38,6 @@ describe(`whyDidYouUpdate`, () => {
     node = document.createElement(`div`)
     groupStore = createConsoleStore(`group`)
     warnStore = createConsoleStore(`warn`)
-    errorStore = createConsoleStore(`error`)
     logStore = createConsoleStore(`log`)
   })
 
@@ -48,41 +46,40 @@ describe(`whyDidYouUpdate`, () => {
     unmountComponentAtNode(node)
     groupStore.destroy()
     warnStore.destroy()
-    errorStore.destroy()
     logStore.destroy()
   })
 
-  it(`logs an error on same props`, () => {
+  it(`logs an warning on same props`, () => {
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
     const group = groupStore.entries[0][0]
-    const errorMsg = errorStore.entries[0][2]
+    const warnMsg = warnStore.entries[0][2]
     const prevProps = logStore.entries[0][2]
     const nextProps = logStore.entries[1][2]
 
     assert.equal(group, `Stub.props`)
-    assert.ok(/Value did not change. Avoidable re-render!/.test(errorMsg))
+    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
     assert.deepEqual(prevProps, {a: 1})
     assert.deepEqual(nextProps, {a: 1})
   })
 
-  it(`logs an error on nested props but excludes the parent`, () => {
-    const error = /Value did not change. Avoidable re-render!/
+  it(`logs an warning on nested props but excludes the parent`, () => {
+    const warning = /Value did not change. Avoidable re-render!/
     const createProps = () => ({b: {c: 1}})
     const a = createProps()
 
     render(<Stub a={createProps()} />, node)
     render(<Stub a={createProps()} />, node)
 
-    assert.equal(errorStore.entries.length, 3)
+    assert.equal(warnStore.entries.length, 3)
     assert.equal(groupStore.entries.length, 3)
     assert.equal(groupStore.entries[0][0], `Stub.props`)
     assert.equal(groupStore.entries[1][0], `Stub.props.a`)
     assert.equal(groupStore.entries[2][0], `Stub.props.a.b`)
-    assert.ok(error.test(errorStore.entries[0][2]))
-    assert.ok(error.test(errorStore.entries[1][2]))
-    assert.ok(error.test(errorStore.entries[2][2]))
+    assert.ok(warning.test(warnStore.entries[0][2]))
+    assert.ok(warning.test(warnStore.entries[1][2]))
+    assert.ok(warning.test(warnStore.entries[2][2]))
     assert.deepEqual(logStore.entries[0][2], {a})
     assert.deepEqual(logStore.entries[1][2], {a})
     assert.deepEqual(logStore.entries[2][2], {b: a.b})
@@ -101,9 +98,8 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={{b: fn}} />, node)
     render(<Stub a={{b: fn2}} />, node)
 
-    assert.equal(errorStore.entries.length, 0)
     assert.equal(warnStore.entries.length, 1)
-    assert.ok(warning.test(warnStore.entries[0][2]))
+    assert.ok(warning.test(warnStore.entries[0][0]))
     assert.equal(logStore.entries[0][2], fn)
     assert.equal(logStore.entries[1][2], fn2)
   })
@@ -115,7 +111,7 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
-    assert.equal(errorStore.entries.length, 0)
+    assert.equal(warnStore.entries.length, 0)
   })
 
   it(`can ignore certain names using a string`, () => {
@@ -125,7 +121,7 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
-    assert.equal(errorStore.entries.length, 0)
+    assert.equal(warnStore.entries.length, 0)
   })
 
   it(`can include only certain names using a regexp`, () => {
@@ -147,7 +143,7 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(errorStore.entries.length, 1)
+    assert.equal(warnStore.entries.length, 1)
     assert.equal(groupStore.entries.length, 1)
     assert.equal(groupStore.entries[0][0], `Foo.props`)
   })
@@ -171,7 +167,7 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(errorStore.entries.length, 1)
+    assert.equal(warnStore.entries.length, 1)
     assert.equal(groupStore.entries.length, 1)
     assert.equal(groupStore.entries[0][0], `Foo.props`)
   })
@@ -202,7 +198,7 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(errorStore.entries.length, 2)
+    assert.equal(warnStore.entries.length, 2)
     assert.equal(groupStore.entries.length, 2)
     assert.equal(groupStore.entries[0][0], `Stub.props`)
     assert.equal(groupStore.entries[1][0], `StubBar.props`)

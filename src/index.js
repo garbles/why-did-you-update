@@ -10,9 +10,15 @@ const isRequiredUpdateObject = o => Array.isArray(o) || _isObject(o)
 const getDisplayName = o => o.displayName || o.constructor.displayName || o.constructor.name
 
 const deepDiff = (prev, next, name) => {
-  const notify = (type, status) => {
+  const notify = (status, bold) => {
     console.group(name)
-    console[type](`%c%s`, `font-weight: bold`, status)
+
+    if (bold) {
+      console.warn(`%c%s`, `font-weight: bold`, status)
+    } else {
+      console.warn(status)
+    }
+
     console.log(`%cbefore`, `font-weight: bold`, prev)
     console.log(`%cafter `, `font-weight: bold`, next)
     console.groupEnd()
@@ -25,14 +31,14 @@ const deepDiff = (prev, next, name) => {
 
     if (isFunc) {
       if (prev.name === next.name) {
-        notify(`warn`, `Value is a function. Possibly avoidable re-render?`)
+        notify(`Value is a function. Possibly avoidable re-render?`, false)
       }
     } else if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
       keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
     }
   } else if (prev !== next) {
-    notify(`error`, `Value did not change. Avoidable re-render!`)
+    notify(`Value did not change. Avoidable re-render!`, true)
 
     if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
