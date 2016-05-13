@@ -8,9 +8,9 @@ export const shouldInclude = (displayName, {include, exclude}) => {
 
   if (_isArray(exclude)) {
     isExcluded = false;
-    let i = 0;
-    for (; i < exclude.length; i++) {
-      if (exclude[i] === displayName) {
+    for (let i = 0; i < exclude.length; i++) {
+      const item = exclude[i];
+      if (item.test(displayName)) {
         isExcluded = true;
         break;
       }

@@ -12,7 +12,13 @@ export const normalizeOptions = (opts = {}) => {
   }
 
   if (_isArray(exclude)) {
-    exclude = exclude;
+    for (let i = 0; i < exclude.length; i++) {
+      if (_isString(exclude[i])) {
+        exclude[i] = new RegExp(exclude[i]);
+      } else if (!_isRegExp(exclude[i])){
+        exclude[i] = /[^a-zA-Z0-9]/;
+      }
+    }
   } else if (_isString(exclude)) {
     exclude = new RegExp(exclude)
   } else if (!_isRegExp(exclude)) {

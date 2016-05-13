@@ -145,7 +145,21 @@ describe(`whyDidYouUpdate`, () => {
     render(<YetAnotherStub a={1} />, node)
     render(<YetAnotherStub a={1} />, node)
 
-    assert.equal(warnStore.entries.length, 1)
+    assert.equal(warnStore.entries.length, 0)
+  })
+
+  it(`can ignore multiple names using a regexp`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {exclude: [/Stub/, /AnotherStub/]})
+
+    render(<Stub a={1} />, node)
+    render(<Stub a={1} />, node)
+    render(<AnotherStub a={1} />, node)
+    render(<AnotherStub a={1} />, node)
+    render(<YetAnotherStub a={1} />, node)
+    render(<YetAnotherStub a={1} />, node)
+
+    assert.equal(warnStore.entries.length, 0)
   })
 
   it(`can include only certain names using a regexp`, () => {
