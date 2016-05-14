@@ -211,6 +211,37 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(groupStore.entries[1][0], `StubBar.props`)
   })
 
+  it(`accepts arrasy as args to include/exclude`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {include: [/Stub/], exclude: [/Foo/, 'StubBar']})
+
+    class StubFoo extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    class StubBar extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
+    const createInstance = () =>
+      <div>
+        <Stub a={1} />
+        <StubFoo a={1} />
+        <StubBar a={1} />
+      </div>
+
+    render(createInstance(), node)
+    render(createInstance(), node)
+
+    assert.equal(warnStore.entries.length, 1)
+    assert.equal(groupStore.entries.length, 1)
+    assert.equal(groupStore.entries[0][0], `Stub.props`)
+  })
+
   it(`works with createClass`, () => {
     const Foo = React.createClass({
       displayName: 'Foo',
