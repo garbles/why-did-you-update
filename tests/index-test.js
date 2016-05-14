@@ -1,4 +1,4 @@
-import assert from 'assert'
+import {deepEqual, equal, ok} from 'assert'
 import React from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
 
@@ -12,7 +12,8 @@ const createConsoleStore = type => {
 
   global.console[type] = (...args) => {
     entries.push(args)
-    fn.call(global.console, ...args)
+    // uncomment to debug tests
+    // fn.call(global.console, ...args)
   }
 
   return {
@@ -58,10 +59,10 @@ describe(`whyDidYouUpdate`, () => {
     const prevProps = logStore.entries[0][2]
     const nextProps = logStore.entries[1][2]
 
-    assert.equal(group, `Stub.props`)
-    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
-    assert.deepEqual(prevProps, {a: 1})
-    assert.deepEqual(nextProps, {a: 1})
+    equal(group, `Stub.props`)
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+    deepEqual(prevProps, {a: 1})
+    deepEqual(nextProps, {a: 1})
   })
 
   it(`logs an warning on nested props but excludes the parent`, () => {
@@ -72,20 +73,20 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={createProps()} />, node)
     render(<Stub a={createProps()} />, node)
 
-    assert.equal(warnStore.entries.length, 3)
-    assert.equal(groupStore.entries.length, 3)
-    assert.equal(groupStore.entries[0][0], `Stub.props`)
-    assert.equal(groupStore.entries[1][0], `Stub.props.a`)
-    assert.equal(groupStore.entries[2][0], `Stub.props.a.b`)
-    assert.ok(warning.test(warnStore.entries[0][2]))
-    assert.ok(warning.test(warnStore.entries[1][2]))
-    assert.ok(warning.test(warnStore.entries[2][2]))
-    assert.deepEqual(logStore.entries[0][2], {a})
-    assert.deepEqual(logStore.entries[1][2], {a})
-    assert.deepEqual(logStore.entries[2][2], {b: a.b})
-    assert.deepEqual(logStore.entries[3][2], {b: a.b})
-    assert.deepEqual(logStore.entries[4][2], {c: a.b.c})
-    assert.deepEqual(logStore.entries[5][2], {c: a.b.c})
+    equal(warnStore.entries.length, 3)
+    equal(groupStore.entries.length, 3)
+    equal(groupStore.entries[0][0], `Stub.props`)
+    equal(groupStore.entries[1][0], `Stub.props.a`)
+    equal(groupStore.entries[2][0], `Stub.props.a.b`)
+    ok(warning.test(warnStore.entries[0][2]))
+    ok(warning.test(warnStore.entries[1][2]))
+    ok(warning.test(warnStore.entries[2][2]))
+    deepEqual(logStore.entries[0][2], {a})
+    deepEqual(logStore.entries[1][2], {a})
+    deepEqual(logStore.entries[2][2], {b: a.b})
+    deepEqual(logStore.entries[3][2], {b: a.b})
+    deepEqual(logStore.entries[4][2], {c: a.b.c})
+    deepEqual(logStore.entries[5][2], {c: a.b.c})
   })
 
   it(`logs a warning on function props`, () => {
@@ -98,10 +99,10 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={{b: fn}} />, node)
     render(<Stub a={{b: fn2}} />, node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.ok(warning.test(warnStore.entries[0][0]))
-    assert.equal(logStore.entries[0][2], fn)
-    assert.equal(logStore.entries[1][2], fn2)
+    equal(warnStore.entries.length, 1)
+    ok(warning.test(warnStore.entries[0][0]))
+    equal(logStore.entries[0][2], fn)
+    equal(logStore.entries[1][2], fn2)
   })
 
   it(`can ignore certain names using a regexp`, () => {
@@ -111,17 +112,17 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
-    assert.equal(warnStore.entries.length, 0)
+    equal(warnStore.entries.length, 0)
   })
 
   it(`can ignore certain names using a string`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
-    whyDidYouUpdate(React, {exclude: 'Stub'})
+    whyDidYouUpdate(React, {exclude: `Stub`})
 
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
-    assert.equal(warnStore.entries.length, 0)
+    equal(warnStore.entries.length, 0)
   })
 
   it(`can include only certain names using a regexp`, () => {
@@ -143,14 +144,14 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.equal(groupStore.entries.length, 1)
-    assert.equal(groupStore.entries[0][0], `Foo.props`)
+    equal(warnStore.entries.length, 1)
+    equal(groupStore.entries.length, 1)
+    equal(groupStore.entries[0][0], `Foo.props`)
   })
 
   it(`can include only certain names using a string`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
-    whyDidYouUpdate(React, {include: 'Foo'})
+    whyDidYouUpdate(React, {include: `Foo`})
 
     class Foo extends React.Component {
       render () {
@@ -174,9 +175,9 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.equal(groupStore.entries.length, 1)
-    assert.equal(groupStore.entries[0][0], `Foo.props`)
+    equal(warnStore.entries.length, 1)
+    equal(groupStore.entries.length, 1)
+    equal(groupStore.entries[0][0], `Foo.props`)
   })
 
   it(`can both include an exclude option`, () => {
@@ -205,15 +206,15 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(warnStore.entries.length, 2)
-    assert.equal(groupStore.entries.length, 2)
-    assert.equal(groupStore.entries[0][0], `Stub.props`)
-    assert.equal(groupStore.entries[1][0], `StubBar.props`)
+    equal(warnStore.entries.length, 2)
+    equal(groupStore.entries.length, 2)
+    equal(groupStore.entries[0][0], `Stub.props`)
+    equal(groupStore.entries[1][0], `StubBar.props`)
   })
 
   it(`accepts arrasy as args to include/exclude`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
-    whyDidYouUpdate(React, {include: [/Stub/], exclude: [/Foo/, 'StubBar']})
+    whyDidYouUpdate(React, {include: [/Stub/], exclude: [/Foo/, `StubBar`]})
 
     class StubFoo extends React.Component {
       render () {
@@ -237,14 +238,14 @@ describe(`whyDidYouUpdate`, () => {
     render(createInstance(), node)
     render(createInstance(), node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.equal(groupStore.entries.length, 1)
-    assert.equal(groupStore.entries[0][0], `Stub.props`)
+    equal(warnStore.entries.length, 1)
+    equal(groupStore.entries.length, 1)
+    equal(groupStore.entries[0][0], `Stub.props`)
   })
 
   it(`works with createClass`, () => {
     const Foo = React.createClass({
-      displayName: 'Foo',
+      displayName: `Foo`,
 
       render () {
         return <noscript />
@@ -254,14 +255,14 @@ describe(`whyDidYouUpdate`, () => {
     render(<Foo a={1} />, node)
     render(<Foo a={1} />, node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.equal(groupStore.entries.length, 1)
-    assert.equal(groupStore.entries[0][0], `Foo.props`)
+    equal(warnStore.entries.length, 1)
+    equal(groupStore.entries.length, 1)
+    equal(groupStore.entries[0][0], `Foo.props`)
   })
 
   it(`still calls the original componentDidUpdate for createClass`, done => {
     const Foo = React.createClass({
-      displayName: 'Foo',
+      displayName: `Foo`,
 
       componentDidUpdate () {
         done()
@@ -275,6 +276,6 @@ describe(`whyDidYouUpdate`, () => {
     render(<Foo a={1} />, node)
     render(<Foo a={1} />, node)
 
-    assert.equal(warnStore.entries.length, 1)
+    equal(warnStore.entries.length, 1)
   })
 })
