@@ -217,10 +217,17 @@ describe(`whyDidYouUpdate`, () => {
       }
     }
 
+    class FooBar extends React.Component {
+      render () {
+        return <noscript />
+      }
+    }
+
     const createInstance = () =>
       <div>
         <Stub a={1} />
         <Foo a={1} />
+        <FooBar a={1} />
       </div>
 
     render(createInstance(), node)
@@ -231,9 +238,9 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(groupStore.entries[0][0], `Foo.props`)
   })
 
-  it(`can both include an exclude a string`, () => {
+  it(`can both include an exclude option`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
-    whyDidYouUpdate(React, {include: /Stub/, exclude: 'Foo'})
+    whyDidYouUpdate(React, {include: /Stub/, exclude: /Foo/})
 
     class StubFoo extends React.Component {
       render () {
