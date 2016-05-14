@@ -13,7 +13,8 @@
     "clean": "nwb clean",
     "start": "nwb serve",
     "test": "nwb test",
-    "test:watch": "nwb test --server"
+    "test:watch": "nwb test --server",
+    "release:patch": "nwb build && npm version patch && npm publish"
   },
   "dependencies": {
     "lodash": "4.12.0"
