@@ -26,18 +26,20 @@ export const whyDidYouUpdate = (React, opts = {}) => {
 
   React.Component.prototype.componentDidUpdate = createComponentDidUpdate(opts)
 
-  React.createClass = function createClass (obj) {
-    if (!obj.mixins) {
-      obj.mixins = []
+  if (_createClass) {
+    React.createClass = function createClass (obj) {
+      if (!obj.mixins) {
+        obj.mixins = []
+      }
+
+      const Mixin = {
+        componentDidUpdate: createComponentDidUpdate(opts)
+      }
+
+      obj.mixins = [Mixin].concat(obj.mixins)
+
+      return _createClass.call(React, obj)
     }
-
-    const Mixin = {
-      componentDidUpdate: createComponentDidUpdate(opts)
-    }
-
-    obj.mixins = [Mixin].concat(obj.mixins)
-
-    return _createClass.call(React, obj)
   }
 
   React.__WHY_DID_YOU_UPDATE_RESTORE_FN__ = () => {
