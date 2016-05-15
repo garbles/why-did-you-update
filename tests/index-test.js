@@ -82,17 +82,28 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same nested immutable props`, () => {
+    const warning = /Value did not change. Avoidable re-render!/
     const TestRecord = Record({b: 'default value', ref: {c: 1}});
 
-    render(<Stub a={TestRecord({b: 'some value', ref: {c: 2}})} />, node)
-    render(<Stub a={TestRecord({b: 'some value', ref: {c: 2}})} />, node)
+    const createProps = () => TestRecord({b: 'some value', ref: {c: 2}});
+    const a = createProps()
 
-    const group = groupStore.entries[0][0]
-    const warnMsg = warnStore.entries[0][2]
+    render(<Stub a={createProps()} />, node)
+    render(<Stub a={createProps()} />, node)
 
-    assert.equal(group, `Stub.props`)
-    assert.equal(warnStore.entries.length, 3);
-    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+    assert.equal(warnStore.entries.length, 3)
+    assert.equal(groupStore.entries.length, 3)
+    assert.equal(groupStore.entries[0][0], `Stub.props`)
+    assert.equal(groupStore.entries[1][0], `Stub.props.a`)
+    assert.equal(groupStore.entries[2][0], `Stub.props.a.ref`)
+    assert.ok(warning.test(warnStore.entries[0][2]))
+    assert.ok(warning.test(warnStore.entries[1][2]))
+    assert.ok(warning.test(warnStore.entries[2][2]))
+    assert.deepEqual(logStore.entries[0][2], {a})
+    assert.deepEqual(logStore.entries[1][2], {a})
+    // immutable props can't be deepEqual
+    assert.deepEqual(logStore.entries[4][2], {c: a.ref.c})
+    assert.deepEqual(logStore.entries[5][2], {c: a.ref.c})
   })
 
   it(`logs an warning on nested props but excludes the parent`, () => {
