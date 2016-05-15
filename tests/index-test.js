@@ -146,6 +146,23 @@ describe(`whyDidYouUpdate`, () => {
     assert.equal(logStore.entries[1][2], fn2)
   })
 
+  it(`logs a warning on function props(in immutable Record)`, () => {
+    const warning = /Value is a function. Possibly avoidable re-render\?/
+    const TestRecord = Record({b: 'default value', func: ()=>{}});
+    const createFn = () => function sameFuncName () {}
+
+    const fn = createFn()
+    const fn2 = createFn()
+
+    render(<Stub a={TestRecord({b: 'some value', func: fn})} />, node)
+    render(<Stub a={TestRecord({b: 'some value', func: fn2})} />, node)
+
+    assert.equal(warnStore.entries.length, 1)
+    assert.ok(warning.test(warnStore.entries[0][0]))
+    assert.equal(logStore.entries[0][2], fn)
+    assert.equal(logStore.entries[1][2], fn2)
+  })
+
   it(`can ignore certain names using a regexp`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
     whyDidYouUpdate(React, {exclude: /Stub/})
