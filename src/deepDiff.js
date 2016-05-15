@@ -53,6 +53,7 @@ export class DeepDiff {
   refDeepDiff(){
     let keys;
     if(this.isImmutable()){
+      // Immutable.List's instance do not have _keys, so forEach do not execute 😎
       keys = _union(this.prev._keys, this.next._keys);
     } else {
       keys = _union(_keys(this.prev), _keys(this.next))

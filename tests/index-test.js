@@ -2,7 +2,8 @@ import {deepEqual, equal, ok} from 'assert'
 import React from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
 import Immutable, {
-  Record
+  Record,
+  List
 } from 'immutable';
 
 import whyDidYouUpdate from 'src/'
@@ -68,11 +69,23 @@ describe(`whyDidYouUpdate`, () => {
     deepEqual(nextProps, {a: 1})
   })
 
-  it(`logs an warning on same immutable props`, () => {
+  it(`logs an warning on same Immutable.Record props`, () => {
     const TestRecord = Record({b: 'default value'});
 
     render(<Stub a={TestRecord({b: 'some value'})} />, node)
     render(<Stub a={TestRecord({b: 'some value'})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+  })
+
+  it.only(`logs an warning on same Immutable.List props`, () => {
+    render(<Stub a={List.of(1, 2, {a:1})} />, node)
+    render(<Stub a={List.of(1, 2, {a:1})} />, node)
 
     const group = groupStore.entries[0][0]
     const warnMsg = warnStore.entries[0][2]
