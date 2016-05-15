@@ -51,10 +51,19 @@ export class DeepDiff {
   }
 
   refDeepDiff(){
-    const keys = _union(_keys(this.prev), _keys(this.next))
+    let keys;
+    if(this.isImmutable()){
+      keys = _union(this.prev._keys, this.next._keys);
+    } else {
+      keys = _union(_keys(this.prev), _keys(this.next))
+    }
     keys.forEach(key => {
       return new DeepDiff(this.prev[key], this.next[key], `${this.name}.${key}`).run()
     })
+  }
+
+  isImmutable(){
+    return Immutable.Iterable.isIterable(this.prev) && Immutable.Iterable.isIterable(this.next);
   }
 }
 

@@ -8,7 +8,6 @@ import Immutable, {
 import whyDidYouUpdate from 'src/'
 
 const noop = () => {}
-const TestRecord = Record({test: 'value'});
 
 const createConsoleStore = type => {
   const entries = []
@@ -69,18 +68,31 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same immutable props`, () => {
-    render(<Stub a={TestRecord({test: 'some value'})} />, node)
-    render(<Stub a={TestRecord({test: 'some value'})} />, node)
+    const TestRecord = Record({b: 'default value'});
+
+    render(<Stub a={TestRecord({b: 'some value'})} />, node)
+    render(<Stub a={TestRecord({b: 'some value'})} />, node)
 
     const group = groupStore.entries[0][0]
     const warnMsg = warnStore.entries[0][2]
-    const prevProps = logStore.entries[0][2]
-    const nextProps = logStore.entries[1][2]
 
     assert.equal(group, `Stub.props`)
+    assert.equal(warnStore.entries.length, 2);
     assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
-    assert.ok(Immutable.is(prevProps.a, TestRecord({test: 'some value'})))
-    assert.ok(Immutable.is(nextProps.a, TestRecord({test: 'some value'})))
+  })
+
+  it(`logs an warning on same nested immutable props`, () => {
+    const TestRecord = Record({b: 'default value', ref: {c: 1}});
+
+    render(<Stub a={TestRecord({b: 'some value', ref: {c: 2}})} />, node)
+    render(<Stub a={TestRecord({b: 'some value', ref: {c: 2}})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    assert.equal(group, `Stub.props`)
+    assert.equal(warnStore.entries.length, 3);
+    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
   })
 
   it(`logs an warning on nested props but excludes the parent`, () => {
