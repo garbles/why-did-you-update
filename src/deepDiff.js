@@ -7,9 +7,37 @@ import Immutable from 'immutable';
 
 const isReferenceEntity = o => Array.isArray(o) || _isObject(o)
 
-export const deepDiff = (prev, next, name) => {
-  const notify = (status, bold) => {
-    console.group(name)
+export class DeepDiff {
+  constructor(prev, next, name){
+    this.prev = prev
+    this.next = next
+    this.name = name
+  }
+
+  run(){
+    const isRefEntity = isReferenceEntity(this.prev) && isReferenceEntity(this.next)
+
+    if (!_isEqual(this.prev, this.next)) {
+      const isFunc = _isFunction(this.prev) && _isFunction(this.next)
+
+      if (isFunc) {
+        if (this.prev.name === this.next.name) {
+          this.notify(`Value is a function. Possibly avoidable re-render?`, false)
+        }
+      } else if (isRefEntity) {
+        this.refDeepDiff()
+      }
+    } else if (this.prev !== this.next) {
+      this.notify(`Value did not change. Avoidable re-render!`, true)
+
+      if (isRefEntity) {
+        this.refDeepDiff()
+      }
+    }
+  }
+
+  notify(status, bold){
+    console.group(this.name)
 
     if (bold) {
       console.warn(`%c%s`, `font-weight: bold`, status)
@@ -17,37 +45,16 @@ export const deepDiff = (prev, next, name) => {
       console.warn(status)
     }
 
-    console.log(`%cbefore`, `font-weight: bold`, prev)
-    console.log(`%cafter `, `font-weight: bold`, next)
+    console.log(`%cbefore`, `font-weight: bold`, this.prev)
+    console.log(`%cafter `, `font-weight: bold`, this.next)
     console.groupEnd()
   }
 
-  const isRefEntity = isReferenceEntity(prev) && isReferenceEntity(next)
-
-  if(Immutable.Iterable.isIterable(prev) && Immutable.Iterable.isIterable(next)){
-    if(Immutable.is(prev, next)){
-      return notify(`Value did not change. Avoidable re-render!`, true);
-    }
-  }
-
-  if (!_isEqual(prev, next)) {
-    const isFunc = _isFunction(prev) && _isFunction(next)
-
-    if (isFunc) {
-      if (prev.name === next.name) {
-        notify(`Value is a function. Possibly avoidable re-render?`, false)
-      }
-    } else if (isRefEntity) {
-      const keys = _union(_keys(prev), _keys(next))
-      keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
-    }
-  } else if (prev !== next) {
-    notify(`Value did not change. Avoidable re-render!`, true)
-
-    if (isRefEntity) {
-      const keys = _union(_keys(prev), _keys(next))
-      keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
-    }
+  refDeepDiff(){
+    const keys = _union(_keys(this.prev), _keys(this.next))
+    keys.forEach(key => {
+      return new DeepDiff(this.prev[key], this.next[key], `${this.name}.${key}`).run()
+    })
   }
 }
 
