@@ -77,9 +77,9 @@ describe(`whyDidYouUpdate`, () => {
     const group = groupStore.entries[0][0]
     const warnMsg = warnStore.entries[0][2]
 
-    assert.equal(group, `Stub.props`)
-    assert.equal(warnStore.entries.length, 2);
-    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
   })
 
   it(`logs an warning on nested props but excludes the parent`, () => {
@@ -116,19 +116,19 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={createProps()} />, node)
     render(<Stub a={createProps()} />, node)
 
-    assert.equal(warnStore.entries.length, 3)
-    assert.equal(groupStore.entries.length, 3)
-    assert.equal(groupStore.entries[0][0], `Stub.props`)
-    assert.equal(groupStore.entries[1][0], `Stub.props.a`)
-    assert.equal(groupStore.entries[2][0], `Stub.props.a.ref`)
-    assert.ok(warning.test(warnStore.entries[0][2]))
-    assert.ok(warning.test(warnStore.entries[1][2]))
-    assert.ok(warning.test(warnStore.entries[2][2]))
-    assert.deepEqual(logStore.entries[0][2], {a})
-    assert.deepEqual(logStore.entries[1][2], {a})
+    equal(warnStore.entries.length, 3)
+    equal(groupStore.entries.length, 3)
+    equal(groupStore.entries[0][0], `Stub.props`)
+    equal(groupStore.entries[1][0], `Stub.props.a`)
+    equal(groupStore.entries[2][0], `Stub.props.a.ref`)
+    ok(warning.test(warnStore.entries[0][2]))
+    ok(warning.test(warnStore.entries[1][2]))
+    ok(warning.test(warnStore.entries[2][2]))
+    deepEqual(logStore.entries[0][2], {a})
+    deepEqual(logStore.entries[1][2], {a})
     // immutable props can't be deepEqual
-    assert.deepEqual(logStore.entries[4][2], {c: a.ref.c})
-    assert.deepEqual(logStore.entries[5][2], {c: a.ref.c})
+    deepEqual(logStore.entries[4][2], {c: a.ref.c})
+    deepEqual(logStore.entries[5][2], {c: a.ref.c})
   })
 
   it(`logs a warning on function props`, () => {
@@ -158,10 +158,10 @@ describe(`whyDidYouUpdate`, () => {
     render(<Stub a={TestRecord({b: 'some value', func: fn})} />, node)
     render(<Stub a={TestRecord({b: 'some value', func: fn2})} />, node)
 
-    assert.equal(warnStore.entries.length, 1)
-    assert.ok(warning.test(warnStore.entries[0][0]))
-    assert.equal(logStore.entries[0][2], fn)
-    assert.equal(logStore.entries[1][2], fn2)
+    equal(warnStore.entries.length, 1)
+    ok(warning.test(warnStore.entries[0][0]))
+    equal(logStore.entries[0][2], fn)
+    equal(logStore.entries[1][2], fn2)
   })
 
   it(`can ignore certain names using a regexp`, () => {
