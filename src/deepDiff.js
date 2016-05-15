@@ -3,6 +3,7 @@ import _isFunction from 'lodash/isFunction'
 import _isObject from 'lodash/isObject'
 import _keys from 'lodash/keys'
 import _union from 'lodash/union'
+import Immutable from 'immutable';
 
 const isReferenceEntity = o => Array.isArray(o) || _isObject(o)
 
@@ -22,6 +23,12 @@ export const deepDiff = (prev, next, name) => {
   }
 
   const isRefEntity = isReferenceEntity(prev) && isReferenceEntity(next)
+
+  if(Immutable.Iterable.isIterable(prev) && Immutable.Iterable.isIterable(next)){
+    if(Immutable.is(prev, next)){
+      return notify(`Value did not change. Avoidable re-render!`, true);
+    }
+  }
 
   if (!_isEqual(prev, next)) {
     const isFunc = _isFunction(prev) && _isFunction(next)

@@ -1,10 +1,14 @@
 import {deepEqual, equal, ok} from 'assert'
 import React from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
+import Immutable, {
+  Record
+} from 'immutable';
 
 import whyDidYouUpdate from 'src/'
 
 const noop = () => {}
+const TestRecord = Record({test: 'value'});
 
 const createConsoleStore = type => {
   const entries = []
@@ -63,6 +67,21 @@ describe(`whyDidYouUpdate`, () => {
     ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
     deepEqual(prevProps, {a: 1})
     deepEqual(nextProps, {a: 1})
+  })
+
+  it(`logs an warning on same immutable props`, () => {
+    render(<Stub a={TestRecord({test: 'some value'})} />, node)
+    render(<Stub a={TestRecord({test: 'some value'})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+    const prevProps = logStore.entries[0][2]
+    const nextProps = logStore.entries[1][2]
+
+    assert.equal(group, `Stub.props`)
+    assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+    assert.ok(Immutable.is(prevProps.a, TestRecord({test: 'some value'})))
+    assert.ok(Immutable.is(nextProps.a, TestRecord({test: 'some value'})))
   })
 
   it(`logs an warning on nested props but excludes the parent`, () => {
