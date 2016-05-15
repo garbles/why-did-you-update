@@ -81,6 +81,30 @@ describe(`whyDidYouUpdate`, () => {
     assert.ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
   })
 
+  it(`logs an warning on nested props but excludes the parent`, () => {
+    const warning = /Value did not change. Avoidable re-render!/
+    const createProps = () => ({b: {c: 1}})
+    const a = createProps()
+
+    render(<Stub a={createProps()} />, node)
+    render(<Stub a={createProps()} />, node)
+
+    assert.equal(warnStore.entries.length, 3)
+    assert.equal(groupStore.entries.length, 3)
+    assert.equal(groupStore.entries[0][0], `Stub.props`)
+    assert.equal(groupStore.entries[1][0], `Stub.props.a`)
+    assert.equal(groupStore.entries[2][0], `Stub.props.a.b`)
+    assert.ok(warning.test(warnStore.entries[0][2]))
+    assert.ok(warning.test(warnStore.entries[1][2]))
+    assert.ok(warning.test(warnStore.entries[2][2]))
+    assert.deepEqual(logStore.entries[0][2], {a})
+    assert.deepEqual(logStore.entries[1][2], {a})
+    assert.deepEqual(logStore.entries[2][2], {b: a.b})
+    assert.deepEqual(logStore.entries[3][2], {b: a.b})
+    assert.deepEqual(logStore.entries[4][2], {c: a.b.c})
+    assert.deepEqual(logStore.entries[5][2], {c: a.b.c})
+  })
+
   it(`logs an warning on same nested immutable props`, () => {
     const warning = /Value did not change. Avoidable re-render!/
     const TestRecord = Record({b: 'default value', ref: {c: 1}});
@@ -104,30 +128,6 @@ describe(`whyDidYouUpdate`, () => {
     // immutable props can't be deepEqual
     assert.deepEqual(logStore.entries[4][2], {c: a.ref.c})
     assert.deepEqual(logStore.entries[5][2], {c: a.ref.c})
-  })
-
-  it(`logs an warning on nested props but excludes the parent`, () => {
-    const warning = /Value did not change. Avoidable re-render!/
-    const createProps = () => ({b: {c: 1}})
-    const a = createProps()
-
-    render(<Stub a={createProps()} />, node)
-    render(<Stub a={createProps()} />, node)
-
-    assert.equal(warnStore.entries.length, 3)
-    assert.equal(groupStore.entries.length, 3)
-    assert.equal(groupStore.entries[0][0], `Stub.props`)
-    assert.equal(groupStore.entries[1][0], `Stub.props.a`)
-    assert.equal(groupStore.entries[2][0], `Stub.props.a.b`)
-    assert.ok(warning.test(warnStore.entries[0][2]))
-    assert.ok(warning.test(warnStore.entries[1][2]))
-    assert.ok(warning.test(warnStore.entries[2][2]))
-    assert.deepEqual(logStore.entries[0][2], {a})
-    assert.deepEqual(logStore.entries[1][2], {a})
-    assert.deepEqual(logStore.entries[2][2], {b: a.b})
-    assert.deepEqual(logStore.entries[3][2], {b: a.b})
-    assert.deepEqual(logStore.entries[4][2], {c: a.b.c})
-    assert.deepEqual(logStore.entries[5][2], {c: a.b.c})
   })
 
   it(`logs a warning on function props`, () => {
