@@ -83,9 +83,21 @@ describe(`whyDidYouUpdate`, () => {
     ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
   })
 
-  it.only(`logs an warning on same Immutable.List props`, () => {
+  it(`logs an warning on same Immutable.List props`, () => {
     render(<Stub a={List.of(1, 2, {a:1})} />, node)
     render(<Stub a={List.of(1, 2, {a:1})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+  })
+
+  it(`logs an warning on same Immutable.fromJS props`, () => {
+    render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
+    render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
 
     const group = groupStore.entries[0][0]
     const warnMsg = warnStore.entries[0][2]
