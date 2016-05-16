@@ -6,7 +6,7 @@ const TestRecord = Record({h: 1})
 
 import whyDidYouUpdate from '../../src'
 
-whyDidYouUpdate(React)
+whyDidYouUpdate(React, {useImmutable: true})
 
 class ClassDemo extends React.Component {
   render () {

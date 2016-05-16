@@ -14,6 +14,7 @@ export const normalizeOptions = (opts = {}) => {
 
   return {
     include: toArray(include).map(toRegExp),
-    exclude: toArray(exclude).map(toRegExp)
+    exclude: toArray(exclude).map(toRegExp),
+    useImmutable: opts.useImmutable
   }
 }

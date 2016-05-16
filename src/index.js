@@ -11,15 +11,15 @@ function createComponentDidUpdate (opts) {
       return
     }
 
-    new DeepDiff(prevProps, this.props, `${displayName}.props`).run()
+    new DeepDiff(prevProps, this.props, `${displayName}.props`, opts).run()
 
     if (prevState && this.state) {
-      new DeepDiff(prevState, this.state, `${displayName}.state`).run()
+      new DeepDiff(prevState, this.state, `${displayName}.state`, opts).run()
     }
   }
 }
 
-export const whyDidYouUpdate = (React, opts = {}) => {
+export const whyDidYouUpdate = (React, opts = {useImmutable: false}) => {
   const _componentDidUpdate = React.Component.prototype.componentDidUpdate
   const _createClass = React.createClass
   opts = normalizeOptions(opts)

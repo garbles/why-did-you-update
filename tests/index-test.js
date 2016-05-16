@@ -70,6 +70,8 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same Immutable.Record props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
     const TestRecord = Record({b: 'default value'});
 
     render(<Stub a={TestRecord({b: 'some value'})} />, node)
@@ -84,6 +86,8 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same Immutable.List props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
     render(<Stub a={List.of(1, 2, {a:1})} />, node)
     render(<Stub a={List.of(1, 2, {a:1})} />, node)
 
@@ -96,6 +100,8 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same Immutable.fromJS props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
     render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
     render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
 
@@ -132,6 +138,8 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs an warning on same nested immutable props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
     const warning = /Value did not change. Avoidable re-render!/
     const TestRecord = Record({b: 'default value', ref: {c: 1}});
 
@@ -173,6 +181,8 @@ describe(`whyDidYouUpdate`, () => {
   })
 
   it(`logs a warning on function props(in immutable Record)`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
     const warning = /Value is a function. Possibly avoidable re-render\?/
     const TestRecord = Record({b: 'default value', func: ()=>{}});
     const createFn = () => function sameFuncName () {}

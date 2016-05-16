@@ -8,10 +8,12 @@ import Immutable from 'immutable';
 const isReferenceEntity = o => Array.isArray(o) || _isObject(o)
 
 export class DeepDiff {
-  constructor(prev, next, name){
+  constructor(prev, next, name, opts){
     this.prev = prev
     this.next = next
     this.name = name
+    this.opts = opts
+    this.useImmutable = opts.useImmutable
   }
 
   run(){
@@ -52,14 +54,14 @@ export class DeepDiff {
 
   refDeepDiff(){
     let keys;
-    if(this.isImmutable()){
+    if(this.useImmutable && this.isImmutable()){
       // Immutable.List's instance do not have _keys, so forEach do not execute 😎
       keys = _union(this.prev._keys, this.next._keys);
     } else {
       keys = _union(_keys(this.prev), _keys(this.next))
     }
     keys.forEach(key => {
-      return new DeepDiff(this.prev[key], this.next[key], `${this.name}.${key}`).run()
+      return new DeepDiff(this.prev[key], this.next[key], `${this.name}.${key}`, this.opts).run()
     })
   }
 
