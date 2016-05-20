@@ -17,12 +17,13 @@
     "release:patch": "nwb build && npm version patch && npm publish"
   },
   "dependencies": {
-    "lodash": "4.12.0"
+    "lodash": "^4.13.1"
   },
   "peerDependencies": {
     "react": "^15.0 || 0.14.x"
   },
   "devDependencies": {
+    "lodash-webpack-plugin": "^0.8.1",
     "nwb": "0.9.x",
     "react": "0.14.x",
     "react-dom": "0.14.x"
