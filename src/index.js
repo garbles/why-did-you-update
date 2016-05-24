@@ -1,4 +1,4 @@
-import {deepDiff} from './deepDiff'
+import {DeepDiff} from './deepDiff'
 import {getDisplayName} from './getDisplayName'
 import {normalizeOptions} from './normalizeOptions'
 import {shouldInclude} from './shouldInclude'
@@ -11,15 +11,15 @@ function createComponentDidUpdate (opts) {
       return
     }
 
-    deepDiff(prevProps, this.props, `${displayName}.props`)
+    new DeepDiff(prevProps, this.props, `${displayName}.props`, opts).run()
 
     if (prevState && this.state) {
-      deepDiff(prevState, this.state, `${displayName}.state`)
+      new DeepDiff(prevState, this.state, `${displayName}.state`, opts).run()
     }
   }
 }
 
-export const whyDidYouUpdate = (React, opts = {}) => {
+export const whyDidYouUpdate = (React, opts = {useImmutable: false}) => {
   const _componentDidUpdate = React.Component.prototype.componentDidUpdate
   const _createClass = React.createClass
   opts = normalizeOptions(opts)

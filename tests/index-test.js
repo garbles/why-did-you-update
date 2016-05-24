@@ -1,6 +1,10 @@
 import {deepEqual, equal, ok} from 'assert'
 import React from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
+import Immutable, {
+  Record,
+  List
+} from 'immutable';
 
 import whyDidYouUpdate from 'src/'
 
@@ -65,6 +69,50 @@ describe(`whyDidYouUpdate`, () => {
     deepEqual(nextProps, {a: 1})
   })
 
+  it(`logs an warning on same Immutable.Record props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
+    const TestRecord = Record({b: 'default value'});
+
+    render(<Stub a={TestRecord({b: 'some value'})} />, node)
+    render(<Stub a={TestRecord({b: 'some value'})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+  })
+
+  it(`logs an warning on same Immutable.List props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
+    render(<Stub a={List.of(1, 2, {a:1})} />, node)
+    render(<Stub a={List.of(1, 2, {a:1})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+  })
+
+  it(`logs an warning on same Immutable.fromJS props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
+    render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
+    render(<Stub a={Immutable.fromJS({a: {b: [10, 20, 30]}})} />, node)
+
+    const group = groupStore.entries[0][0]
+    const warnMsg = warnStore.entries[0][2]
+
+    equal(group, `Stub.props`)
+    equal(warnStore.entries.length, 2);
+    ok(/Value did not change. Avoidable re-render!/.test(warnMsg))
+  })
+
   it(`logs an warning on nested props but excludes the parent`, () => {
     const warning = /Value did not change. Avoidable re-render!/
     const createProps = () => ({b: {c: 1}})
@@ -89,6 +137,33 @@ describe(`whyDidYouUpdate`, () => {
     deepEqual(logStore.entries[5][2], {c: a.b.c})
   })
 
+  it(`logs an warning on same nested immutable props`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
+    const warning = /Value did not change. Avoidable re-render!/
+    const TestRecord = Record({b: 'default value', ref: {c: 1}});
+
+    const createProps = () => TestRecord({b: 'some value', ref: {c: 2}});
+    const a = createProps()
+
+    render(<Stub a={createProps()} />, node)
+    render(<Stub a={createProps()} />, node)
+
+    equal(warnStore.entries.length, 3)
+    equal(groupStore.entries.length, 3)
+    equal(groupStore.entries[0][0], `Stub.props`)
+    equal(groupStore.entries[1][0], `Stub.props.a`)
+    equal(groupStore.entries[2][0], `Stub.props.a.ref`)
+    ok(warning.test(warnStore.entries[0][2]))
+    ok(warning.test(warnStore.entries[1][2]))
+    ok(warning.test(warnStore.entries[2][2]))
+    deepEqual(logStore.entries[0][2], {a})
+    deepEqual(logStore.entries[1][2], {a})
+    // immutable props can't be deepEqual
+    deepEqual(logStore.entries[4][2], {c: a.ref.c})
+    deepEqual(logStore.entries[5][2], {c: a.ref.c})
+  })
+
   it(`logs a warning on function props`, () => {
     const warning = /Value is a function. Possibly avoidable re-render\?/
     const createFn = () => function sameFuncName () {}
@@ -98,6 +173,25 @@ describe(`whyDidYouUpdate`, () => {
 
     render(<Stub a={{b: fn}} />, node)
     render(<Stub a={{b: fn2}} />, node)
+
+    equal(warnStore.entries.length, 1)
+    ok(warning.test(warnStore.entries[0][0]))
+    equal(logStore.entries[0][2], fn)
+    equal(logStore.entries[1][2], fn2)
+  })
+
+  it(`logs a warning on function props(in immutable Record)`, () => {
+    React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
+    whyDidYouUpdate(React, {useImmutable: true})
+    const warning = /Value is a function. Possibly avoidable re-render\?/
+    const TestRecord = Record({b: 'default value', func: ()=>{}});
+    const createFn = () => function sameFuncName () {}
+
+    const fn = createFn()
+    const fn2 = createFn()
+
+    render(<Stub a={TestRecord({b: 'some value', func: fn})} />, node)
+    render(<Stub a={TestRecord({b: 'some value', func: fn2})} />, node)
 
     equal(warnStore.entries.length, 1)
     ok(warning.test(warnStore.entries[0][0]))
