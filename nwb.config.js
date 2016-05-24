@@ -1,3 +1,5 @@
+var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+
 module.exports = {
   type: 'react-component',
   build: {
@@ -7,5 +9,12 @@ module.exports = {
     global: 'WhyDidYouUpdate',
     jsNext: false,
     umd: true
+  },
+  webpack: {
+    extra: {
+      plugins: [
+        new LodashModuleReplacementPlugin
+      ]
+    }
   }
 }
