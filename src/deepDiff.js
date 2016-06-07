@@ -6,21 +6,7 @@ import _union from 'lodash/union'
 
 const isReferenceEntity = o => Array.isArray(o) || _isObject(o)
 
-export const deepDiff = (prev, next, name) => {
-  const notify = (status, bold) => {
-    console.group(name)
-
-    if (bold) {
-      console.warn(`%c%s`, `font-weight: bold`, status)
-    } else {
-      console.warn(status)
-    }
-
-    console.log(`%cbefore`, `font-weight: bold`, prev)
-    console.log(`%cafter `, `font-weight: bold`, next)
-    console.groupEnd()
-  }
-
+export const deepDiff = (prev, next, name, notes) => {
   const isRefEntity = isReferenceEntity(prev) && isReferenceEntity(next)
 
   if (!_isEqual(prev, next)) {
@@ -28,19 +14,27 @@ export const deepDiff = (prev, next, name) => {
 
     if (isFunc) {
       if (prev.name === next.name) {
-        notify(`Value is a function. Possibly avoidable re-render?`, false)
+        const status = `Value is a function. Possibly avoidable re-render?`
+        const bold = false
+
+        return notes.concat({name, prev, next, status, bold})
       }
     } else if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
-      keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
+      return keys.reduce((acc, key) => deepDiff(prev[key], next[key], `${name}.${key}`, acc), notes)
     }
   } else if (prev !== next) {
-    notify(`Value did not change. Avoidable re-render!`, true)
+    const status = `Value did not change. Avoidable re-render!`
+    const bold = true
 
     if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
-      keys.forEach(key => deepDiff(prev[key], next[key], `${name}.${key}`))
+      return keys.reduce((acc, key) => deepDiff(prev[key], next[key], `${name}.${key}`, acc), notes.concat({name, prev, next, status, bold}))
+    } else {
+      return notes.concat({name, prev, next, status, bold})
     }
   }
+
+  return notes
 }
 
