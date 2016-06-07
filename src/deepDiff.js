@@ -14,24 +14,21 @@ export const deepDiff = (prev, next, name, notes) => {
 
     if (isFunc) {
       if (prev.name === next.name) {
-        const status = `Value is a function. Possibly avoidable re-render?`
-        const bold = false
-
-        return notes.concat({name, prev, next, status, bold})
+        const type = `function`
+        return notes.concat({name, prev, next, type})
       }
     } else if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
       return keys.reduce((acc, key) => deepDiff(prev[key], next[key], `${name}.${key}`, acc), notes)
     }
   } else if (prev !== next) {
-    const status = `Value did not change. Avoidable re-render!`
-    const bold = true
+    const type = `avoidable`
 
     if (isRefEntity) {
       const keys = _union(_keys(prev), _keys(next))
-      return keys.reduce((acc, key) => deepDiff(prev[key], next[key], `${name}.${key}`, acc), notes.concat({name, prev, next, status, bold}))
+      return keys.reduce((acc, key) => deepDiff(prev[key], next[key], `${name}.${key}`, acc), notes.concat({name, prev, next, type}))
     } else {
-      return notes.concat({name, prev, next, status, bold})
+      return notes.concat({name, prev, next, type})
     }
   }
 
