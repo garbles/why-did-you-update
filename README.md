@@ -9,6 +9,11 @@
 
 A function that monkey patches React and notifies you in the console when **potentially** unnecessary re-renders occur. Super helpful for easy perf gainzzzzz.
 
+### Install
+```js
+npm install --save why-did-you-update
+```
+
 ### How to
 
 ```js
