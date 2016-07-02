@@ -13,9 +13,9 @@ A function that monkey patches React and notifies you in the console when **pote
 
 ```js
 import React from 'react'
-import {whyDidYouUpdate} from 'why-did-you-update'
 
 if (process.env.NODE_ENV !== 'production') {
+  const {whyDidYouUpdate} = require('why-did-you-update')
   whyDidYouUpdate(React)
 }
 ```
