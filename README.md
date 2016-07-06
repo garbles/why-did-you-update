@@ -11,7 +11,7 @@ A function that monkey patches React and notifies you in the console when **pote
 
 ### Install
 ```js
-npm install --save why-did-you-update
+npm install --save-dev why-did-you-update
 ```
 
 ### How to
