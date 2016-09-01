@@ -17,7 +17,9 @@
     "release:patch": "nwb build && npm version patch && npm publish"
   },
   "dependencies": {
-    "lodash": "^4.13.1"
+    "immutable": "^3.7.6",
+    "lodash": "^4.15.0",
+    "lodash-deep": "github:victorporof/lodash-deep#immutable"
   },
   "peerDependencies": {
     "react": "^15.0 || 0.14.x"

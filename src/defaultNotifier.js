@@ -1,4 +1,5 @@
 const FUNC_WARNING = `Value is a function. Possibly avoidable re-render?`
+const IMMUTABLE_WARNING = `Immutables are deeply equal. Possibly avoidable re-render?`
 const AVOIDABLE_WARNING = `Value did not change. Avoidable re-render!`
 
 export const defaultNotifier = ({name, prev, next, type}) => {
@@ -6,7 +7,9 @@ export const defaultNotifier = ({name, prev, next, type}) => {
 
   if (type === `avoidable`) {
     console.warn(`%c%s`, `font-weight: bold`, AVOIDABLE_WARNING)
-  } else {
+  } else if (type === `immutable`) {
+    console.warn(`%c%s`, `font-weight: bold`, IMMUTABLE_WARNING)
+  } else if (type === `function`) {
     console.warn(FUNC_WARNING)
   }
 
