@@ -18,11 +18,9 @@ npm install --save-dev why-did-you-update
 
 ```js
 import React from 'react'
+import { whyDidYouUpdate } from 'why-did-you-update'
 
-if (process.env.NODE_ENV !== 'production') {
-  const {whyDidYouUpdate} = require('why-did-you-update')
-  whyDidYouUpdate(React)
-}
+if (process.env.NODE_ENV !== 'production') whyDidYouUpdate(React)
 ```
 
 You can include or exclude components by their displayName with the include and exclude options
