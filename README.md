@@ -10,7 +10,7 @@
 A function that monkey patches React and notifies you in the console when **potentially** unnecessary re-renders occur. Super helpful for easy perf gainzzzzz.
 
 ### Install
-```js
+```bash
 npm install --save-dev why-did-you-update
 ```
 
