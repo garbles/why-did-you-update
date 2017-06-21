@@ -4,9 +4,7 @@ language: node_js
 node_js:
   - 4
 
-cache:
-  directories:
-    - node_modules
+cache: yarn
 
 before_install:
   - npm install codecov.io coveralls
@@ -14,7 +12,3 @@ before_install:
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-
-branches:
-  only:
-    - master
