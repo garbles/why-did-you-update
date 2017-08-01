@@ -7,9 +7,9 @@ function diffProps (prev, next, displayName) {
   return deepDiff(prev, next, `${displayName}.props`, [])
 }
 
-function diffState (prev, next , displayName) {
+function diffState (prev, next, displayName) {
   if (prev && next) {
-    return deepDiff(pre, next, `${displayName}.state`, [])
+    return deepDiff(prev, next, `${displayName}.state`, [])
   }
 
   return []
