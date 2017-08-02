@@ -9,7 +9,7 @@ function diffProps (prev, next, displayName) {
 
 function diffState (prev, next , displayName) {
   if (prev && next) {
-    return deepDiff(pre, next, `${displayName}.state`, [])
+    return deepDiff(prev, next, `${displayName}.state`, [])
   }
 
   return []
@@ -27,7 +27,7 @@ function createComponentDidUpdate (opts) {
       diffProps(prevProps, this.props, displayName)
         .concat(diffState(prevState, this.state, displayName))
 
-    diffs.forEach(opts.notifier)
+    opts.notifier(opts.groupByComponent, opts.collapseComponentGroups, displayName, diffs)
   }
 }
 

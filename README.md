@@ -27,10 +27,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 ```
 
-You can include or exclude components by their displayName with the include and exclude options
+You can include or exclude components by their displayName with the `include` and `exclude` options
 
 ```js
 whyDidYouUpdate(React, { include: /^pure/, exclude: /^Connect/ })
+```
+
+By default, the changes for each component are grouped by component and these groups collapsed. This can be changed with the `groupByComponent` and `collapseComponentGroups` options:
+
+```js
+whyDidYouUpdate(React, { groupByComponent: true, collapseComponentGroups: false })
 ```
 
 ### Credit

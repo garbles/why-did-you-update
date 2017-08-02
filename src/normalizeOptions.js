@@ -12,13 +12,17 @@ export const normalizeOptions = (opts = {}) => {
   let {
     include = [DEFAULT_INCLUDE],
     exclude = [DEFAULT_EXCLUDE],
-    notifier = defaultNotifier
+    groupByComponent = true,
+    collapseComponentGroups = true,
+    notifier = defaultNotifier,
   } = opts
 
 
   return {
     notifier,
     include: toArray(include).map(toRegExp),
-    exclude: toArray(exclude).map(toRegExp)
+    exclude: toArray(exclude).map(toRegExp),
+    groupByComponent,
+    collapseComponentGroups,
   }
 }
