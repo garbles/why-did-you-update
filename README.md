@@ -1,3 +1,5 @@
+### THIS IS NOT BEING MANTAINED
+
 # Why did you update, bruh?
 
 [![Travis][build-badge]][build]
