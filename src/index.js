@@ -1,19 +1,7 @@
-import {deepDiff} from './deepDiff'
+import {classifyDiff, DIFF_TYPES} from './deepDiff'
 import {getDisplayName} from './getDisplayName'
 import {normalizeOptions} from './normalizeOptions'
 import {shouldInclude} from './shouldInclude'
-
-function diffProps (prev, next, displayName) {
-  return deepDiff(prev, next, `${displayName}.props`, [])
-}
-
-function diffState (prev, next , displayName) {
-  if (prev && next) {
-    return deepDiff(pre, next, `${displayName}.state`, [])
-  }
-
-  return []
-}
 
 function createComponentDidUpdate (opts) {
   return function componentDidUpdate (prevProps, prevState) {
@@ -23,11 +11,17 @@ function createComponentDidUpdate (opts) {
       return
     }
 
-    const diffs =
-      diffProps(prevProps, this.props, displayName)
-        .concat(diffState(prevState, this.state, displayName))
+    const propsDiff = classifyDiff(prevProps, this.props, `${displayName}.props`)
+    if (propsDiff.type === DIFF_TYPES.UNAVOIDABLE) {
+      return
+    }
 
-    diffs.forEach(opts.notifier)
+    const stateDiff = classifyDiff(prevState, this.state, `${displayName}.state`)
+    if (stateDiff.type === DIFF_TYPES.UNAVOIDABLE) {
+      return
+    }
+
+    opts.notifier(displayName, [propsDiff, stateDiff])
   }
 }
 
@@ -40,15 +34,15 @@ export const whyDidYouUpdate = (React, opts = {}) => {
 
   if (_createClass) {
     React.createClass = function createClass (obj) {
-      if (!obj.mixins) {
-        obj.mixins = []
-      }
-
       const Mixin = {
         componentDidUpdate: createComponentDidUpdate(opts)
       }
 
-      obj.mixins = [Mixin].concat(obj.mixins)
+      if (obj.mixins) {
+        obj.mixins = [Mixin].concat(obj.mixins)
+      } else {
+        obj.mixins = [Mixin]
+      }
 
       return _createClass.call(React, obj)
     }
