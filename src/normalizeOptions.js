@@ -15,7 +15,6 @@ export const normalizeOptions = (opts = {}) => {
     notifier = defaultNotifier
   } = opts
 
-
   return {
     notifier,
     include: toArray(include).map(toRegExp),

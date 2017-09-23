@@ -1,6 +1,7 @@
 import {deepEqual, equal, ok} from 'assert'
 import React from 'react'
 import {render, unmountComponentAtNode} from 'react-dom'
+import Immutable from 'immutable'
 
 import whyDidYouUpdate from 'src/'
 
@@ -50,7 +51,7 @@ describe(`whyDidYouUpdate`, () => {
     logStore.destroy()
   })
 
-  it(`logs an warning on same props`, () => {
+  it(`logs a warning on same props`, () => {
     render(<Stub a={1} />, node)
     render(<Stub a={1} />, node)
 
@@ -65,7 +66,7 @@ describe(`whyDidYouUpdate`, () => {
     deepEqual(nextProps, {a: 1})
   })
 
-  it(`logs an warning on nested props but excludes the parent`, () => {
+  it(`logs a warning on nested props but excludes the parent`, () => {
     const warning = /Value did not change. Avoidable re-render!/
     const createProps = () => ({b: {c: 1}})
     const a = createProps()
@@ -103,6 +104,144 @@ describe(`whyDidYouUpdate`, () => {
     ok(warning.test(warnStore.entries[0][0]))
     equal(logStore.entries[0][2], fn)
     equal(logStore.entries[1][2], fn2)
+  })
+
+  it(`logs a warning on immutables (1)`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub foo={foo} />, node)
+    render(<Stub foo={foo} />, node)
+
+    const warning = /Value did not change. Avoidable re-render!/
+    equal(warnStore.entries.length, 2)
+    equal(groupStore.entries.length, 2)
+    equal(groupStore.entries[0][0], `Stub.props`)
+    equal(groupStore.entries[1][0], `Stub.props.foo`)
+    ok(warning.test(warnStore.entries[0][2]))
+    ok(warning.test(warnStore.entries[1][2]))
+    deepEqual(logStore.entries[0][2], {foo: foo.toJS()})
+    deepEqual(logStore.entries[1][2], {foo: foo.toJS()})
+    deepEqual(logStore.entries[2][2], foo.toJS())
+    deepEqual(logStore.entries[3][2], foo.toJS())
+  })
+
+  it(`logs a warning on immutables (2)`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub foo={foo} />, node)
+    render(<Stub foo={foo.map(e => e)} />, node)
+
+    const warning = /Immutables are deeply equal. Possibly avoidable re-render?/
+    equal(warnStore.entries.length, 1)
+    equal(groupStore.entries.length, 1)
+    equal(groupStore.entries[0][0], `Stub.props.foo`)
+    ok(warning.test(warnStore.entries[0][2]))
+    deepEqual(logStore.entries[0][2], foo.toJS())
+    deepEqual(logStore.entries[1][2], foo.toJS())
+  })
+
+  it(`logs a warning on multiple immutables`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('bar')
+    render(<Stub first={foo1} second={foo2} />, node)
+    render(<Stub first={foo1} second={foo2} />, node)
+
+    equal(warnStore.entries.length, 3)
+    equal(groupStore.entries.length, 3)
+    equal(warnStore.entries.length, 3)
+  })
+
+  it(`logs a warning on immutables and plain values`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub first={foo} second={'baz'} />, node)
+    render(<Stub first={foo} second={'baz'} />, node)
+
+    equal(warnStore.entries.length, 2)
+    equal(groupStore.entries.length, 2)
+    equal(warnStore.entries.length, 2)
+  })
+
+  it(`doesn't log a warning when a render was necessary`, () => {
+    render(<Stub foo={1} />, node)
+    render(<Stub foo={2} />, node)
+
+    equal(warnStore.entries.length, 0)
+  })
+
+  it(`logs a warning when a render was necessary and deeply equal immutables are involved`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('bar')
+    render(<Stub foo={foo1} />, node)
+    render(<Stub foo={foo2} />, node)
+
+    const warning = /Immutables are deeply equal. Possibly avoidable re-render?/
+    equal(warnStore.entries.length, 1)
+    ok(warning.test(warnStore.entries[0][2]))
+  })
+
+  it(`logs a warning when a render was necessary and deeply equal immutables are involved (multiple)`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('bar-same')
+    const foo3 = Immutable.List.of('bar-same')
+    render(<Stub foo-same={foo1} foo-changed={foo2} />, node)
+    render(<Stub foo-same={foo1} foo-changed={foo3} />, node)
+
+    const warning = /Immutables are deeply equal. Possibly avoidable re-render?/
+    equal(warnStore.entries.length, 2)
+    ok(warning.test(warnStore.entries[0][2]))
+    ok(warning.test(warnStore.entries[1][2]))
+  })
+
+  it(`logs a warning when a render was necessary and deeply equal immutables are involved (nested)`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('bar')
+    render(<Stub foo={{baz: foo1}} />, node)
+    render(<Stub foo={{baz: foo2}} />, node)
+
+    const warning = /Immutables are deeply equal. Possibly avoidable re-render?/
+    equal(warnStore.entries.length, 1)
+    ok(warning.test(warnStore.entries[0][2]))
+  })
+
+  it(`doesn't log a warning when a render was necessary and immutables with distinct values are involved (1)`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('baz')
+    render(<Stub foo={foo1} />, node)
+    render(<Stub foo={foo2} />, node)
+
+    equal(warnStore.entries.length, 0)
+  })
+
+  it(`doesn't log a warning when a render was necessary and immutables with distinct values are involved (2)`, () => {
+    const foo1 = Immutable.List.of('bar')
+    const foo2 = Immutable.List.of('bar')
+    const foo3 = Immutable.List.of('bar-different')
+    render(<Stub foo-same={foo1} foo-changed={foo2} />, node)
+    render(<Stub foo-same={foo1} foo-changed={foo3} />, node)
+
+    equal(warnStore.entries.length, 0)
+  })
+
+  it(`doesn't log a warning when a render was necessary and immutables changed to plain values`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub foo={foo} />, node)
+    render(<Stub foo={'bar'} />, node)
+
+    equal(warnStore.entries.length, 0)
+  })
+
+  it(`doesn't log a warning when a render was necessary and immutables changed to plain values (nested)`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub foo={{bar: foo}} />, node)
+    render(<Stub foo={{bar: 'bar'}} />, node)
+
+    equal(warnStore.entries.length, 0)
+  })
+
+  it(`doesn't log a warning when a render was necessary and both immutables and plain values are involved`, () => {
+    const foo = Immutable.List.of('bar')
+    render(<Stub first={foo} second={'baz'} />, node)
+    render(<Stub first={foo} second={'baz-changed'} />, node)
+
+    equal(warnStore.entries.length, 0)
   })
 
   it(`can ignore certain names using a regexp`, () => {
@@ -212,7 +351,7 @@ describe(`whyDidYouUpdate`, () => {
     equal(groupStore.entries[1][0], `StubBar.props`)
   })
 
-  it(`accepts arrasy as args to include/exclude`, () => {
+  it(`accepts arrays as args to include/exclude`, () => {
     React.__WHY_DID_YOU_UPDATE_RESTORE_FN__()
     whyDidYouUpdate(React, {include: [/Stub/], exclude: [/Foo/, `StubBar`]})
 
