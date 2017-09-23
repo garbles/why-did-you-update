@@ -1,5 +1,5 @@
-const FUNC_WARNING = `Value is a function. Possibly avoidable re-render?`
-const AVOIDABLE_WARNING = `Value did not change. Avoidable re-render!`
+const FUNC_WARNING = `🙊 Value is a function. Possibly avoidable re-render?`
+const AVOIDABLE_WARNING = `💥 Value did not change. Avoidable re-render!`
 
 export const defaultNotifier = ({name, prev, next, type}) => {
   console.group(name)
